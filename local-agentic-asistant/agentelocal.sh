@@ -1,4 +1,13 @@
 #!/bin/bash 🤖 === SETUP ASISTENTE IA MEJORADO ===
+# ==============================================================================
+# 🤖 SETUP ASISTENTE IA LOCAL - INSTALADOR AVANZADO
+# ==============================================================================
+# Autor: Eto Demerzel ~ Gustavo Silva
+# Versión: 2.0.0
+# Descripción: Instalador automatizado para Asistente IA Local con capacidades
+#              agénticas mejoradas, validación de entorno y configuración adaptativa
+# ==============================================================================
+
 set -euo pipefail
 
 # Colores para output
