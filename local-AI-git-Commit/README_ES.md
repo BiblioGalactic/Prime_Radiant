@@ -42,6 +42,6 @@ Fecha de creación: $(date +%F)
 3. Prepara tus modelos `.gguf` y `llama-cli` compilado.
 4. Ejecuta:
 
-```bash
+
 chmod +x local-Commit.sh
 ./local-Commit.sh
