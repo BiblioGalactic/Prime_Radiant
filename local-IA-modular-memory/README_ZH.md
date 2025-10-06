@@ -32,4 +32,7 @@
 	•	本地 GGUF 模型
 
 ⸻
+**Eto Demerzel** (Gustavo Silva Da Costa)
+https://etodemerzel.gumroad.com  
+https://github.com/BiblioGalactic
 

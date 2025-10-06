@@ -39,3 +39,6 @@ Licencia
 Open-source. Úsalo libremente, modifícalo y compártelo.
 
 
+**Eto Demerzel** (Gustavo Silva Da Costa)
+https://etodemerzel.gumroad.com  
+https://github.com/BiblioGalactic

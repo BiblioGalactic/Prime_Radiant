@@ -1,6 +1,5 @@
 Local AI MMAP Memory
 
-English Version
 
 Local AI MMAP Memory is a public Bash + C launcher to run LLaMA with multiple modular prompts loaded directly into memory using mmap. Each profile represents a different AI context (technical, philosophical, security, etc.), allowing efficient prompt handling without creating temporary files.
 

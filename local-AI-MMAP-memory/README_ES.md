@@ -1,5 +1,3 @@
-Versión en Español
-
 Local AI MMAP Memory es un lanzador público en Bash + C para ejecutar LLaMA con múltiples perfiles modulares cargados directamente en memoria mediante mmap. Cada perfil representa un contexto IA distinto (técnico, filosófico, seguridad, etc.), permitiendo manejar prompts eficientemente sin archivos temporales.
 
 Funcionalidades
