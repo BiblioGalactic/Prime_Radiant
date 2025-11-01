@@ -1,0 +1,30 @@
+# Queries de Ejemplo para AI Cluster
+# Una query por línea - el script las distribuirá automáticamente
+
+# Preguntas técnicas
+Explica qué es una red neuronal en 50 palabras
+Define qué es el aprendizaje automático
+¿Qué es la computación cuántica?
+Resume qué es blockchain
+Explica cómo funciona un motor de búsqueda
+
+# Preguntas de conocimiento general
+Resume la teoría de la relatividad
+¿Cuál es la capital de Japón?
+¿Quién inventó la bombilla?
+Resume la historia de Internet en 100 palabras
+Explica la fotosíntesis de forma simple
+
+# Creatividad
+Escribe un haiku sobre la tecnología
+Escribe un poema corto sobre el mar
+Escribe tres consejos para aprender programación
+Escribe un consejo motivacional para programadores
+Crea un eslogan para una empresa de IA
+
+# Programación
+Define qué es un algoritmo
+Explica la diferencia entre RAM y disco duro
+¿Qué lenguaje de programación es mejor para empezar?
+Define qué es el cloud computing
+Resume qué es el Big Data
