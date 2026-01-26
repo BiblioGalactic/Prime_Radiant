@@ -1,0 +1,24 @@
+WIKIRAG
+Version: A1 (Alpha 1)
+Release: 2026-01-26
+Codename: Vanguardia
+
+Features:
+- RAG Adaptativo (broad/focused/balanced/iterative)
+- Multi-Modelo con selección inteligente
+- Sistema de Triaje (TINY→SMALL→MEDIUM→LARGE→GIANT)
+- Memoria a Largo Plazo (episódica, semántica, procedural)
+- Agente ReAct (Thought→Action→Observation)
+- Query Refiner (expansión, descomposición, contextual)
+- Response Critic (evaluación y mejora automática)
+- Terminal Fix (restauración automática de TTY)
+- Throttle para modelos grandes
+
+Changelog:
+- Fix: Terminal no se corrompe después de consultas
+- Fix: Modelos no entran en modo interactivo
+- Add: Sistema de triaje con puntuación
+- Add: Throttle para modelos LARGE/GIANT
+- Add: Métricas de confianza sofisticadas
+- Add: Memoria persistente SQLite
+- Add: Cache de planes exitosos
