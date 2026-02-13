@@ -1,0 +1,7 @@
+{
+  "llama_cli": "~/modelo/llama.cpp/build/bin/llama-cli",
+  "model_path": "~/modelo/modelos_grandes/M6/mistral-7b-instruct-v0.1.Q6_K.gguf",
+  "model_agents": "~/modelo/modelos_grandes/M6/mistral-7b-instruct-v0.1.Q6_K.gguf",
+  "model_code": "~/modelo/modelos_grandes/M6/mistral-7b-instruct-v0.1.Q6_K.gguf",
+  "semantic_model": "sentence-transformers/all-MiniLM-L6-v2"
+}

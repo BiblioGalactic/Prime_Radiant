@@ -1,0 +1,383 @@
+================================================================================
+                 VERSIONE5: ÁRBOL VISUAL DEL PROYECTO
+================================================================================
+
+UBICACIÓN EN DISCO
+==================
+
+/sessions/friendly-zealous-heisenberg/mnt/wikirag/
+├── releases/
+│   ├── VERSIONE5/                                 ← TÚ ESTÁS AQUÍ
+│   │   ├── ENTREGA.md                             [Documento de entrega]
+│   │   ├── INDEX.md                               [Índice completo]
+│   │   ├── QUICKSTART.md                          [Inicio rápido]
+│   │   ├── README.md                              [Documentación]
+│   │   ├── RESUMEN.txt                            [Resumen técnico]
+│   │   ├── ESTRUCTURA.txt                         [Arquitectura]
+│   │   ├── ARBOL.txt                              [Este archivo]
+│   │   │
+│   │   ├── config.py         (78 líneas)          [Configuración]
+│   │   ├── llm.py            (99 líneas)          [LLM interface]
+│   │   ├── rag.py            (108 líneas)         [RAG]
+│   │   ├── main.py           (106 líneas)         [Orquestador]
+│   │   ├── test_import.py    (70 líneas)          [Testing]
+│   │   │
+│   │   └── requirements.txt   (3 dependencias)    [Deps Python]
+│   │
+│   ├── VERSIONE4/                                 [Anterior - no usado]
+│   └── VERSIONE3/                                 [Anterior - no usado]
+│
+├── models/                                        [Tus modelos GGUF]
+│   └── model.gguf                                 (debes preparar)
+│
+├── data/
+│   ├── documents/                                 [Documentos brutos]
+│   └── faiss_index/                               [Tu índice]
+│       ├── index.faiss                            (debes preparar)
+│       └── chunks.pkl                             (debes preparar)
+│
+└── scripts/                                       [Scripts auxiliares]
+    ├── build_index.py                             (no en VERSIONE5)
+    └── [otros]
+
+RESPONSABILIDADES DE ARCHIVOS
+============================
+
+DOCUMENTACIÓN (7 archivos, ~1600 líneas)
+─────────────────────────────────────────
+
+┌─ ENTREGA.md
+│  Resumen de qué has recibido
+│  Para: Primero que lees
+│  Lectura: 10 min
+
+├─ QUICKSTART.md
+│  Instalación y uso en 60 segundos
+│  Para: Usuarios con prisa
+│  Lectura: 5 min
+
+├─ README.md
+│  Documentación completa
+│  Para: Usuarios normales
+│  Lectura: 10 min
+
+├─ INDEX.md
+│  Índice cruzado de documentación
+│  Para: Referencia rápida
+│  Lectura: Puntual
+
+├─ ESTRUCTURA.txt
+│  Arquitectura y diseño interno
+│  Para: Desarrolladores
+│  Lectura: 20 min
+
+├─ RESUMEN.txt
+│  Resumen técnico exhaustivo
+│  Para: Arquitectos
+│  Lectura: 30 min
+
+└─ ARBOL.txt
+   Este archivo
+   Para: Entender la estructura
+   Lectura: 10 min
+
+
+CÓDIGO (4 módulos, 391 líneas totales)
+──────────────────────────────────────
+
+┌─ config.py (78 líneas)
+│  
+│  RESPONSABILIDAD:
+│  ├─ Detectar automáticamente rutas del proyecto
+│  ├─ Validar que archivos clave existan
+│  ├─ Cargar parámetros de configuración
+│  └─ Fallar rápido con mensajes claros
+│  
+│  FUNCIONES:
+│  ├─ get_base_path() → Path (raíz del proyecto)
+│  ├─ get_model_path() → str (ruta a .gguf)
+│  ├─ get_index_path() → str (ruta a index.faiss)
+│  └─ get_*() para parámetros (temp, tokens, etc.)
+│  
+│  IMPORTACIONES: pathlib, os (stdlib)
+│  DEPENDENCIAS: Ninguna (es la raíz)
+│  
+│  OUTPUT AL IMPORTAR:
+│  ✓ Configuración cargada desde: /path/to/wikirag
+│  ✓ Modelo GGUF: model.gguf
+│  ✓ Índice FAISS: index.faiss
+
+├─ llm.py (99 líneas)
+│  
+│  RESPONSABILIDAD:
+│  ├─ Interfaz simple con modelo GGUF
+│  ├─ Usar llama-cli como subprocess
+│  ├─ Manejar timeouts y errores
+│  └─ Generar texto de forma síncrona y streaming
+│  
+│  CLASE: SimpleLLM
+│  ├─ __init__() → verifica llama-cli disponible
+│  ├─ query(prompt) → str (respuesta sincróna)
+│  ├─ stream_query(prompt) → generator (tokens)
+│  └─ _verify_llama_cli() → privado
+│  
+│  IMPORTACIONES: subprocess, config, pathlib
+│  DEPENDENCIAS: config.py, llama-cli (binario)
+│  
+│  FLUJO:
+│  prompt → subprocess.run(llama-cli ...) → stdout → respuesta
+
+├─ rag.py (108 líneas)
+│  
+│  RESPONSABILIDAD:
+│  ├─ Cargar índice FAISS pre-generado
+│  ├─ Cargar chunks (metadatos) desde pickle
+│  ├─ Recuperar contexto relevante usando embeddings
+│  └─ Retornar fragmentos ordenados por relevancia
+│  
+│  CLASE: SimpleRAG
+│  ├─ __init__() → carga índice + chunks
+│  ├─ search(query) → str (contexto concatenado)
+│  ├─ search_with_scores(query) → list (con relevancia)
+│  ├─ _load_index() → privado (FAISS)
+│  └─ _load_chunks() → privado (pickle)
+│  
+│  IMPORTACIONES: faiss, pickle, numpy, sentence-transformers
+│  DEPENDENCIAS: config.py, index.faiss, chunks.pkl
+│  
+│  FLUJO:
+│  query → encode (sentence-transformers)
+│        → search FAISS
+│        → recuperar chunks
+│        → concatenar → contexto
+
+└─ main.py (106 líneas)
+   
+   RESPONSABILIDAD:
+   ├─ Inicializar LLM + RAG
+   ├─ Leer preguntas del usuario (stdin)
+   ├─ Ejecutar pipeline RAG → LLM
+   ├─ Imprimir respuestas (stdout)
+   └─ Loop interactivo hasta "exit"
+   
+   CLASE: WikiRAGE5
+   ├─ __init__() → carga LLM + RAG
+   ├─ answer(question) → (respuesta, contexto)
+   ├─ interactive_loop() → while True
+   └─ main() → punto de entrada
+   
+   IMPORTACIONES: sys, pathlib, llm, rag
+   DEPENDENCIAS: config.py, llm.py, rag.py
+   
+   FLUJO:
+   ┌─────────────────────────────────────┐
+   │ Usuario: "¿Qué es Python?"          │
+   └─────────────────────────────────────┘
+                    ↓
+   ┌─────────────────────────────────────┐
+   │ input() → question                  │
+   └─────────────────────────────────────┘
+                    ↓
+   ┌─────────────────────────────────────┐
+   │ rag.search(question) → contexto     │
+   └─────────────────────────────────────┘
+                    ↓
+   ┌─────────────────────────────────────┐
+   │ Construir prompt                    │
+   │ "Contexto: ... Pregunta: ..."       │
+   └─────────────────────────────────────┘
+                    ↓
+   ┌─────────────────────────────────────┐
+   │ llm.query(prompt) → respuesta       │
+   └─────────────────────────────────────┘
+                    ↓
+   ┌─────────────────────────────────────┐
+   │ print(respuesta)                    │
+   └─────────────────────────────────────┘
+
+
+TESTING (1 archivo, 70 líneas)
+──────────────────────────────
+
+└─ test_import.py
+   
+   RESPONSABILIDAD:
+   ├─ Verificar que todos los módulos importan
+   ├─ Probar que llama-cli está disponible
+   ├─ Verificar que FAISS se carga correctamente
+   └─ Dar diagnóstico claro si algo falla
+   
+   EJECUCIÓN:
+   python test_import.py
+   
+   OUTPUT ESPERADO:
+   [1/4] Importando config...
+     ✓ config.py cargado
+   [2/4] Importando llm...
+     ✓ llm.py cargado
+   [3/4] Importando rag...
+     ✓ rag.py cargado
+   [4/4] Importando main...
+     ✓ main.py cargado
+   
+   ✓ Todos los módulos importan correctamente
+
+
+DEPENDENCIAS (3 librerías Python)
+─────────────────────────────────
+
+└─ requirements.txt
+   
+   faiss-cpu==1.8.0
+   ├─ Búsqueda vectorial L2
+   └─ Necesario para rag.py
+   
+   sentence-transformers==3.0.1
+   ├─ Embeddings de texto
+   └─ Necesario para rag.py
+   
+   numpy==1.24.3
+   ├─ Soporte numérico
+   └─ Necesario para faiss
+
+
+DEPENDENCIAS ENTRE MÓDULOS (GRAFO)
+==================================
+
+                    main.py
+                    /  |  \
+                   /   |   \
+              config  llm   rag
+                   \   |   /
+                    \  |  /
+                  (config.py es raíz)
+
+
+IMPORTACIÓN EN ORDEN DE EJECUCIÓN
+==================================
+
+1. python main.py
+
+2. main.py:
+   import sys
+   import pathlib
+   import llm
+   import rag
+
+3. llm:
+   import subprocess
+   import json
+   import pathlib
+   import config
+
+4. config (se ejecuta):
+   import os
+   import pathlib
+   # Validaciones y prints
+
+5. rag:
+   import pickle
+   import numpy
+   import faiss
+   import pathlib
+   import sentence-transformers
+   import config
+
+6. main.py:WikiRAGE5().__init__()
+   SimpleLLM()  # Carga modelo GGUF
+   SimpleRAG()  # Carga FAISS + chunks
+
+
+FLUJO DE EJECUCIÓN EN TIEMPO REAL
+=================================
+
+┌─ INICIO (carga)
+│  └─ config.py ejecuta
+│     ├─ Detecta rutas
+│     ├─ Valida archivos
+│     └─ Imprime status
+
+├─ INICIALIZACIÓN (5 seg aprox)
+│  ├─ SimpleLLM()
+│  │  └─ Verifica llama-cli
+│  └─ SimpleRAG()
+│     ├─ Carga FAISS index
+│     ├─ Carga chunks.pkl
+│     └─ Carga modelo embeddings
+
+├─ LOOP INTERACTIVO (espera)
+│  └─ Imprime: "> Pregunta: "
+│     └─ Espera input
+
+├─ PROCESAMIENTO (pregunta)
+│  ├─ RAG.search(query)
+│  │  ├─ Embed query (100ms)
+│  │  ├─ Search FAISS (10ms)
+│  │  └─ Recuperar chunks (5ms)
+│  │
+│  ├─ Construir prompt (5ms)
+│  │
+│  ├─ LLM.query(prompt)
+│  │  ├─ Subprocess call (5ms)
+│  │  ├─ Esperar respuesta (10-60s)
+│  │  └─ Procesar output (100ms)
+│  │
+│  └─ Imprimir respuesta (100ms)
+
+└─ LOOP CONTINÚA
+
+
+ÁRBOL DE DEPENDENCIAS DETALLADO
+==============================
+
+config.py
+├─ import os (stdlib)
+├─ import pathlib (stdlib)
+└─ (SIN dependencias externas)
+
+llm.py
+├─ import subprocess (stdlib)
+├─ import json (stdlib)
+├─ import pathlib (stdlib)
+├─ from config import ...
+└─ (DEPENDE DE: config.py, llama-cli)
+
+rag.py
+├─ import pickle (stdlib)
+├─ import numpy (pip)
+├─ import faiss (pip)
+├─ import pathlib (stdlib)
+├─ from sentence_transformers import ...
+├─ from config import ...
+└─ (DEPENDE DE: config.py, faiss, sentence-transformers, index.faiss, chunks.pkl)
+
+main.py
+├─ import sys (stdlib)
+├─ import pathlib (stdlib)
+├─ import llm (módulo local)
+├─ import rag (módulo local)
+└─ (DEPENDE DE: config.py, llm.py, rag.py, llama-cli, index.faiss)
+
+test_import.py
+├─ import sys (stdlib)
+├─ import pathlib (stdlib)
+├─ from config import ...
+├─ from llm import ...
+├─ from rag import ...
+├─ from main import ...
+└─ (DEPENDE DE: todos los anteriores)
+
+
+ESTADO DE VERSIONE5
+==================
+
+✓ Código completo
+✓ Documentación exhaustiva
+✓ Testing incorporado
+✓ Configuración automática
+✓ Error handling claro
+✓ Pronto para usar
+
+PRÓXIMO PASO: python main.py
+
+================================================================================

@@ -1,0 +1,372 @@
+================================================================================
+                     VERSIONE5: ESTRUCTURA DE CÓDIGO
+================================================================================
+
+ARCHIVOS Y RESPONSABILIDADES
+
+┌─ config.py
+│  Responsabilidad: Detectar rutas y cargar configuración
+│  
+│  Funciones principales:
+│  ├─ get_base_path()       → Directorio raíz del proyecto
+│  ├─ get_model_path()      → Ruta del modelo GGUF
+│  ├─ get_index_path()      → Ruta del índice FAISS
+│  ├─ get_embeddings_model() → Nombre del modelo de embeddings
+│  ├─ get_context_window()  → Fragmentos a recuperar (default: 5)
+│  ├─ get_max_tokens()      → Tokens máximos (default: 512)
+│  └─ get_temperature()     → Temperatura (default: 0.7)
+│
+│  Importaciones: pathlib, os (solo stdlib)
+│  Líneas: 78
+│  Fallos: Rápido y claro si faltan archivos
+│
+└─ Uso: from config import MODEL_PATH, INDEX_PATH, ...
+
+┌─ llm.py
+│  Responsabilidad: Interfaz con modelo LLM via llama-cli
+│
+│  Clase: SimpleLLM
+│  ├─ __init__()              → Verifica llama-cli disponible
+│  ├─ query(prompt) → str     → Envía prompt, retorna respuesta
+│  ├─ stream_query(prompt)    → Generador de tokens
+│  └─ _verify_llama_cli()     → Validación interna
+│
+│  Importaciones: subprocess, config, pathlib
+│  Líneas: 99
+│  Subprocess: Solo sync (no daemons)
+│  Error handling: TimeoutExpired + mensajes claros
+│
+└─ Uso: llm = SimpleLLM(); response = llm.query("¿Quién eres?")
+
+┌─ rag.py
+│  Responsabilidad: Recuperación de contexto con FAISS
+│
+│  Clase: SimpleRAG
+│  ├─ __init__()                    → Carga índice + chunks
+│  ├─ search(query) → str           → Retorna contexto
+│  ├─ search_with_scores(query)     → Retorna (fragment, score)
+│  ├─ _load_index()                 → Lee index.faiss
+│  └─ _load_chunks()                → Lee chunks.pkl
+│
+│  Importaciones: faiss, pickle, numpy, sentence-transformers
+│  Líneas: 108
+│  Embedding: sentence-transformers/all-MiniLM-L6-v2
+│  K: CONTEXT_WINDOW (default 5)
+│
+└─ Uso: rag = SimpleRAG(); context = rag.search("¿Qué es Python?")
+
+┌─ main.py
+│  Responsabilidad: Orquestar el sistema y loop interactivo
+│
+│  Clase: WikiRAGE5
+│  ├─ __init__()              → Inicializa LLM + RAG
+│  ├─ answer(question)        → Procesa pregunta completa
+│  ├─ interactive_loop()      → Loop stdin/stdout
+│  └─ main()                  → Punto de entrada
+│
+│  Flujo:
+│  ├─ Lee config
+│  ├─ Carga LLM
+│  ├─ Carga RAG
+│  └─ Para cada pregunta:
+│      ├─ rag.search() → contexto
+│      ├─ Construye prompt
+│      ├─ llm.query() → respuesta
+│      └─ Imprime respuesta
+│
+│  Importaciones: sys, pathlib, llm, rag
+│  Líneas: 106
+│  Loop: while True (controlado con "exit")
+│  I/O: input() + print()
+│
+└─ Uso: python main.py
+
+┌─ requirements.txt
+│  Dependencias externas (pip install)
+│
+│  ├─ faiss-cpu==1.8.0              → Búsqueda vectorial
+│  ├─ sentence-transformers==3.0.1  → Embeddings
+│  └─ numpy==1.24.3                 → Soporte numérico
+│
+│  Líneas: 3
+│  Nota: llama-cli NO entra aquí (herramienta binaria)
+│
+└─ Instalación: pip install -r requirements.txt
+
+┌─ README.md
+│  Documentación para usuarios
+│
+│  Secciones:
+│  ├─ Requisitos
+│  ├─ Instalación (3 pasos)
+│  ├─ Uso (ejemplo interactivo)
+│  ├─ Arquitectura
+│  ├─ Estructura de directorios
+│  ├─ Troubleshooting (tabla)
+│  ├─ Limitaciones intencionales
+│  └─ Próximos pasos opcionales
+│
+│  Líneas: ~150
+│  Tono: Práctico, sin rodeos
+│
+└─ Lectura: cat README.md
+
+┌─ RESUMEN.txt
+│  Este documento (resumen técnico completo)
+│
+│  Secciones:
+│  ├─ Objetivo
+│  ├─ Estructura
+│  ├─ Componentes en detalle
+│  ├─ Flujo de ejecución
+│  ├─ Requisitos
+│  ├─ Configuración automática
+│  ├─ Limitaciones intencionales
+│  ├─ Casos de uso
+│  ├─ Ventajas
+│  └─ Filosofía
+│
+│  Líneas: ~400
+│
+└─ Lectura: cat RESUMEN.txt
+
+┌─ test_import.py
+│  Script de verificación
+│
+│  Pruebas:
+│  ├─ Importa config.py
+│  ├─ Importa llm.py
+│  ├─ Importa rag.py
+│  ├─ Importa main.py
+│  ├─ Verifica llama-cli
+│  └─ Carga FAISS
+│
+│  Líneas: ~70
+│  Uso: python test_import.py
+│
+└─ Output: Reporte de qué funciona/qué falta
+
+┌─ ESTRUCTURA.txt
+│  Este documento (definición de responsabilidades)
+│
+└─ Lectura: cat ESTRUCTURA.txt
+
+================================================================================
+DEPENDENCIAS ENTRE MÓDULOS
+================================================================================
+
+main.py
+  ├─→ config.py    (Lee: MODEL_PATH, INDEX_PATH, etc.)
+  ├─→ llm.py       (Usa: SimpleLLM)
+  │   └─→ config.py (Lee: MODEL_PATH, MAX_TOKENS, TEMPERATURE)
+  └─→ rag.py       (Usa: SimpleRAG)
+      └─→ config.py (Lee: INDEX_PATH, EMBEDDINGS_MODEL, CONTEXT_WINDOW)
+
+Ningún módulo se importa entre sí (solo desde main.py).
+config.py es la hoja (sin dependencias).
+
+================================================================================
+LÍNEA POR LÍNEA: INICIALIZACIÓN
+================================================================================
+
+1. Usuario ejecuta: python main.py
+
+2. main.py importa:
+   - sys (stdlib)
+   - pathlib (stdlib)
+   - llm (módulo local)
+   - rag (módulo local)
+
+3. llm importa:
+   - subprocess (stdlib)
+   - json (stdlib)
+   - pathlib (stdlib)
+   - config (módulo local)
+
+4. config se ejecuta:
+   - Define funciones get_*()
+   - Ejecuta validaciones (verifica archivos)
+   - Imprime: "✓ Configuración cargada..."
+   - Imprime: "✓ Modelo GGUF: ..."
+   - Imprime: "✓ Índice FAISS: ..."
+
+5. rag importa:
+   - pickle (stdlib)
+   - numpy (pip)
+   - faiss (pip)
+   - pathlib (stdlib)
+   - sentence_transformers (pip)
+   - config (módulo local)
+
+6. main.py:WikiRAGE5.__init__() ejecuta:
+   - SimpleLLM() → Verifica llama-cli
+   - SimpleRAG() → Carga index.faiss + chunks.pkl
+   - SimpleRAG() → Carga modelo de embeddings
+
+7. Loop interactivo:
+   - Imprime: "> Pregunta: "
+   - Lee input
+   - Ejecuta: rag.search(question)
+   - Ejecuta: llm.query(prompt)
+   - Imprime respuesta
+
+================================================================================
+VARIABLES GLOBALES (en config.py)
+================================================================================
+
+BASE_PATH              Path          Raíz del proyecto
+MODEL_PATH             str           Ruta a .gguf
+INDEX_PATH             str           Ruta a index.faiss
+EMBEDDINGS_MODEL       str           "sentence-transformers/..."
+CONTEXT_WINDOW         int           5
+MAX_TOKENS             int           512
+TEMPERATURE            float         0.7
+
+Todas se cargan al inicio (una sola vez).
+
+================================================================================
+FLUJO DE UNA PREGUNTA
+================================================================================
+
+Usuario: "¿Qué es Python?"
+         │
+         ├─ main.py: input() → "¿Qué es Python?"
+         │
+         ├─ WikiRAGE5.answer(question)
+         │  │
+         │  ├─ rag.search("¿Qué es Python?")
+         │  │  ├─ SentenceTransformer.encode() → vector
+         │  │  ├─ faiss.search() → índices top-5
+         │  │  ├─ Lee chunks[idx] para cada resultado
+         │  │  └─ Concatena → contexto (400-600 palabras)
+         │  │
+         │  ├─ Construye prompt:
+         │  │  "Basado en el siguiente contexto, responde...
+         │  │   CONTEXTO: [contexto de RAG]
+         │  │   PREGUNTA: ¿Qué es Python?"
+         │  │
+         │  ├─ llm.query(prompt)
+         │  │  ├─ subprocess.run(['llama-cli', '-m', model, '-p', prompt, ...])
+         │  │  ├─ Espera respuesta (timeout 120s)
+         │  │  └─ Retorna stdout
+         │  │
+         │  └─ Retorna (respuesta, contexto)
+         │
+         └─ Imprime respuesta
+            Opcionalmente: Imprime contexto
+
+================================================================================
+GESTIÓN DE ERRORES
+================================================================================
+
+Punto            Error probable         Acción
+─────────────────────────────────────────────────────────────
+config.py        Model no existe        FileNotFoundError + msg claro
+config.py        Index no existe        FileNotFoundError + msg claro
+llm.py           llama-cli no existe    RuntimeError + instrucciones
+llm.py           Timeout > 120s         subprocess.TimeoutExpired
+rag.py           FAISS corrupto         RuntimeError + msg
+rag.py           chunks.pkl no existe   FileNotFoundError
+main.py          Ctrl+C                 KeyboardInterrupt → exit graceful
+
+Todos los errores tienen mensajes informativos.
+Nada falla silenciosamente.
+
+================================================================================
+PATRONES UTILIZADOS
+================================================================================
+
+1. Singleton pattern (implícito)
+   - SimpleLLM: Una instancia en main
+   - SimpleRAG: Una instancia en main
+
+2. Dependency Injection (explícito)
+   - config.py proporciona parámetros
+   - main.py inyecta en LLM y RAG
+
+3. Pipeline pattern
+   - input → search → construct prompt → query → output
+
+4. Factory pattern (simple)
+   - config.get_model_path() → crea ruta dinámicamente
+
+================================================================================
+EXTENSIONES POSIBLES (FUTURA VERSIONE6)
+================================================================================
+
+Sin romper la estructura:
+
+1. Agregar caché
+   ├─ self.cache = {} en WikiRAGE5
+   ├─ Antes de rag.search(), verificar cache
+   └─ Después de llm.query(), guardar en cache
+
+2. Agregar logging
+   ├─ import logging en main.py
+   ├─ logging.basicConfig(filename='wikirag.log')
+   └─ log antes/después de cada operación
+
+3. Agregar API REST
+   ├─ from flask import Flask
+   ├─ @app.route('/ask', methods=['POST'])
+   └─ return jsonify({response, context})
+
+4. Agregar persistencia de sesiones
+   ├─ import json
+   ├─ Guardar (pregunta, respuesta) en history.json
+   └─ Cargar al inicio
+
+5. Agregar benchmarks
+   ├─ import time
+   ├─ Medir tiempo de search + query
+   └─ Imprimir stats
+
+PERO: Cada feature debe justificarse.
+      Si no es esencial, NO entra en E5.
+
+================================================================================
+LÍMITES POR DISEÑO
+================================================================================
+
+Sin chat memory:
+  ✗ No reconoce contexto de preguntas anteriores
+  ✓ Cada pregunta es independiente
+  ✓ Menor complejidad
+
+Sin evaluadores:
+  ✗ No mide calidad de respuesta
+  ✓ Devuelve lo que el LLM genera
+  ✓ Menor overhead
+
+Sin caching:
+  ✗ La misma pregunta se procesa 2 veces
+  ✓ Simpler implementation
+  ✓ RAM constante
+
+Sin web UI:
+  ✗ Solo CLI (stdin/stdout)
+  ✓ Fácil integrar en scripts
+  ✓ Sin dependencias web
+
+Estos límites son INTENCIONALES.
+Son trade-offs aceptados a cambio de simplificidad.
+
+================================================================================
+LÍNEA DE CÓDIGO MÁS IMPORTANTE
+================================================================================
+
+main.py:
+    response, context = self.answer(question)
+
+Una sola línea que orquesta:
+  - RAG search
+  - Prompt construction
+  - LLM query
+  - Error handling
+
+Si llama falla, todo falla (fail-fast).
+Si llama funciona, todo funciona.
+
+================================================================================
+FIN DE LA ESTRUCTURA
+================================================================================

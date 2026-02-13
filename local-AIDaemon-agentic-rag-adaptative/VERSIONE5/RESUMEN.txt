@@ -1,0 +1,277 @@
+================================================================================
+                    WikiRAG VERSIONE5 - RESUMEN TÉCNICO
+================================================================================
+
+OBJETIVO: Sistema RAG mínimo, práctico y funcional.
+FILOSOFÍA: Si no es esencial, no está.
+
+================================================================================
+ESTRUCTURA
+================================================================================
+
+VERSIONE5/
+├── config.py          (78 líneas)  → Detecta rutas, carga configuración
+├── llm.py             (99 líneas)  → Interfaz con llama-cli
+├── rag.py            (108 líneas)  → RAG básico con FAISS
+├── main.py           (106 líneas)  → Loop interactivo
+├── requirements.txt    (3 deps)    → Dependencias Python
+├── README.md          (150 líneas) → Documentación
+└── RESUMEN.txt        (este archivo)
+
+TOTAL: ~391 líneas de código Python
+       + 3 dependencias externas (faiss, sentence-transformers, numpy)
+       + 1 herramienta externa (llama-cli)
+
+================================================================================
+COMPONENTES EN DETALLE
+================================================================================
+
+1. CONFIG.PY (78 líneas)
+   ├─ Detecta automáticamente rutas (modelo, índice, base)
+   ├─ Parámetros de configuración (temp, tokens, contexto)
+   ├─ Sin dependencias externas (solo pathlib, os)
+   └─ Falla rápido si faltan archivos clave
+
+2. LLM.PY (99 líneas)
+   ├─ SimpleLLM: interfaz minimalista
+   ├─ llama-cli como subprocess (sin daemons)
+   ├─ query(prompt) → respuesta
+   ├─ stream_query(prompt) → generador (tokens)
+   └─ Manejo de timeouts y errores
+
+3. RAG.PY (108 líneas)
+   ├─ SimpleRAG: recuperación básica
+   ├─ Carga índice FAISS + chunks.pkl
+   ├─ Embeddings con sentence-transformers
+   ├─ search(query) → contexto concatenado
+   ├─ search_with_scores(query) → relevancia
+   └─ K=5 fragmentos por defecto (configurable)
+
+4. MAIN.PY (106 líneas)
+   ├─ WikiRAGE5: clase controladora
+   ├─ answer(question) → (respuesta, contexto)
+   ├─ Flujo: pregunta → RAG search → LLM query → respuesta
+   ├─ Loop interactivo simple (stdin/stdout)
+   ├─ Opcional: mostrar contexto usado
+   └─ Exit condition: "exit", "quit", "salir"
+
+================================================================================
+FLUJO DE EJECUCIÓN
+================================================================================
+
+python main.py
+    │
+    ├─→ Carga config.py (detecta rutas, parámetros)
+    │
+    ├─→ Inicializa SimpleLLM (verifica llama-cli)
+    │
+    ├─→ Inicializa SimpleRAG (carga FAISS + chunks)
+    │
+    └─→ Loop interactivo:
+        │
+        ├─→ Lee pregunta del usuario
+        │
+        ├─→ RAG.search(question)
+        │   └─→ Embed query
+        │   └─→ FAISS.search() → top-5 chunks
+        │   └─→ Concatena contexto
+        │
+        ├─→ Construye prompt (context + question)
+        │
+        ├─→ LLM.query(prompt)
+        │   └─→ Subprocess: llama-cli -m model.gguf -p prompt
+        │   └─→ Lee stdout
+        │   └─→ Retorna respuesta
+        │
+        └─→ Imprime respuesta + opción de ver contexto
+
+================================================================================
+REQUISITOS Y DEPENDENCIAS
+================================================================================
+
+Python Packages (requirements.txt):
+  ✓ faiss-cpu==1.8.0
+  ✓ sentence-transformers==3.0.1
+  ✓ numpy==1.24.3
+
+Herramientas externas:
+  ✓ llama-cli (https://github.com/ggerganov/llama.cpp/releases)
+
+Archivos de entrada:
+  ✓ models/*.gguf (modelo GGUF cualquier tamaño)
+  ✓ data/faiss_index/index.faiss (índice FAISS)
+  ✓ data/faiss_index/chunks.pkl (metadatos de chunks)
+
+================================================================================
+CONFIGURACIÓN AUTOMÁTICA
+================================================================================
+
+Las rutas se detectan así:
+
+BASE_PATH → get_base_path()
+           └─→ Path(__file__).parent.parent.parent
+               (3 niveles arriba de VERSIONE5/)
+
+MODEL_PATH → get_model_path()
+             └─→ BASE_PATH / models / *.gguf (primer .gguf)
+
+INDEX_PATH → get_index_path()
+             └─→ BASE_PATH / data / faiss_index / index.faiss
+
+Todo es automático. Si faltan archivos, falla rápido con mensaje claro.
+
+================================================================================
+PARÁMETROS (en config.py)
+================================================================================
+
+EMBEDDINGS_MODEL        = "sentence-transformers/all-MiniLM-L6-v2"
+CONTEXT_WINDOW          = 5                    # chunks por búsqueda
+MAX_TOKENS              = 512                  # generación LLM
+TEMPERATURE             = 0.7                  # creatividad (0-1)
+
+Todos ajustables en config.py
+
+================================================================================
+LIMITACIONES INTENCIONALES (No incluidas = Filosofía E5)
+================================================================================
+
+❌ Sin chat history
+❌ Sin sesiones persistentes
+❌ Sin evaluadores de calidad
+❌ Sin logging complejo
+❌ Sin APIs REST (aún)
+❌ Sin MCP
+❌ Sin smart routers
+❌ Sin caching
+❌ Sin memory
+❌ Sin web scraping
+
+✓ Solo lo esencial: pregunta → buscar → responder
+
+================================================================================
+CASOS DE USO
+================================================================================
+
+1. Q&A simple sobre documentos indexados
+2. Chatbot básico sin memoria
+3. Prototipo rápido de RAG
+4. Testing de modelos GGUF
+5. Demo de FAISS + LLM
+
+NO es para:
+- Aplicaciones con memoria larga
+- Sistemas multi-turno complejos
+- Producción con SLA
+- Mil usuarios simultáneos
+
+================================================================================
+EJEMPLO DE USO
+================================================================================
+
+$ python main.py
+
+=== WikiRAG VERSIONE5 ===
+
+Cargando componentes...
+✓ LLM listo
+✓ RAG listo
+
+Sistema listo. Escribe 'exit' para salir.
+
+> Pregunta: ¿Cuál es la capital de Francia?
+
+[Buscando contexto...]
+[Generando respuesta...]
+
+[RESPUESTA]
+París es la capital de Francia. La ciudad está ubicada en la región
+de Île-de-France y es el centro político, económico y cultural del país.
+
+¿Ver contexto? (s/n): s
+
+[CONTEXTO UTILIZADO]
+Francia es un país ubicado en Europa Occidental con una población de 67 millones
+de habitantes. La capital es París, una ciudad de importancia histórica y cultural
+que alberga monumentos como la Torre Eiffel...
+
+> Pregunta: exit
+Hasta luego!
+
+================================================================================
+PRÓXIMAS MEJORAS (Opcionales, no en E5)
+================================================================================
+
+Si VERSIONE5 crece:
+
+1. Cache simple (dict en memoria)
+2. Búsqueda multi-query (AND, OR)
+3. Modelo más rápido (TinyLlama)
+4. Logging a archivo
+5. API REST (Flask 50 líneas)
+6. Streaming (mostrar tokens en vivo)
+7. Benchmark (tiempo respuesta)
+8. Modo batch (leer preguntas de archivo)
+
+PERO: Cada feature debe justificarse.
+      Si no es esencial, NO entra.
+
+================================================================================
+VENTAJAS DE VERSIONE5
+================================================================================
+
+✓ Mínimo: 391 líneas de código
+✓ Claro: Fácil de entender y modificar
+✓ Funcional: Resuelve el problema
+✓ Independiente: No depende de versiones viejas
+✓ Configuración automática: Sin archivos .json complejos
+✓ Errores claros: Falla rápido con mensajes específicos
+✓ Extensible: Fácil agregar features
+
+================================================================================
+INSTALACIÓN RÁPIDA
+================================================================================
+
+1. pip install -r requirements.txt
+2. wget https://github.com/ggerganov/llama.cpp/releases/... llama-cli
+3. chmod +x ~/bin/llama-cli
+4. python main.py
+
+3 pasos. Fin.
+
+================================================================================
+SOPORTE Y BUGS
+================================================================================
+
+Si algo no funciona:
+
+1. ¿Error de config? → Revisa el mensaje de config.py
+2. ¿No encuentra llama-cli? → Instala y agrega a PATH
+3. ¿Index not found? → Ejecuta build_index.py
+4. ¿Timeout? → Aumenta el timeout en llm.py
+5. ¿OOM? → Usa modelo más pequeño
+
+Todos los errores tienen mensajes claros.
+
+================================================================================
+FILOSOFÍA FINAL
+================================================================================
+
+VERSIONE5 es lo opuesto a:
+- Configuración YAML compleja
+- Parámetros que nadie usa
+- Abstracción innecesaria
+- "Extensibilidad futura"
+- "Enterprise features"
+
+VERSIONE5 ES:
+- Código legible
+- Una cosa, hecha bien
+- Sin sorpresas
+- Documenta con docstrings
+- Falla rápido
+
+"Do one thing and do it well" - Unix Philosophy
+
+================================================================================
+                              FIN DEL RESUMEN
+================================================================================

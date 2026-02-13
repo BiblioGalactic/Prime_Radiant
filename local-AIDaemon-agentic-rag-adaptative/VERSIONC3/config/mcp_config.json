@@ -1,0 +1,154 @@
+{
+  "version": "2.3",
+  "description": "WikiRAG MCP Configuration - Herramientas disponibles para agentes",
+  "servers": {
+    "local": {
+      "name": "WikiRAG MCP Server",
+      "description": "Servidor MCP local con 15 herramientas (11 core + 4 Claudia)",
+      "protocol": "json-rpc",
+      "transport": "stdio",
+      "paths": [
+        "~/.mcp_local/mcp_server.py",
+        "~/proyecto/mcp_tool.py",
+        "~/wikirag/mcp_server.py"
+      ]
+    },
+    "claudia": {
+      "name": "Claudia Code Assistant",
+      "description": "Asistente de código IA local (asistente-ia)",
+      "type": "agent",
+      "path": "~/proyecto/asistente-ia",
+      "enabled": true
+    }
+  },
+  "tools": {
+    "core": [
+      {
+        "name": "leer_archivo",
+        "description": "Lee contenido de un archivo (máx 64KB)",
+        "parameters": ["ruta"],
+        "category": "filesystem"
+      },
+      {
+        "name": "escribir_archivo",
+        "description": "Escribe contenido en un archivo (máx 10MB)",
+        "parameters": ["ruta", "contenido", "modo"],
+        "category": "filesystem"
+      },
+      {
+        "name": "listar_directorio",
+        "description": "Lista contenido de un directorio",
+        "parameters": ["ruta", "mostrar_ocultos"],
+        "category": "filesystem"
+      },
+      {
+        "name": "buscar_archivos",
+        "description": "Busca archivos por patrón (glob)",
+        "parameters": ["directorio", "patron", "max_resultados"],
+        "category": "filesystem"
+      },
+      {
+        "name": "buscar_en_contenido",
+        "description": "Busca texto dentro de archivos (grep)",
+        "parameters": ["directorio", "patron", "extension", "max_resultados"],
+        "category": "filesystem"
+      },
+      {
+        "name": "ejecutar_comando",
+        "description": "Ejecuta comando bash (bloqueados: rm, dd, sudo)",
+        "parameters": ["comando", "timeout"],
+        "category": "system"
+      },
+      {
+        "name": "consultar_memoria",
+        "description": "Consulta recursos del sistema (RAM, CPU, disco)",
+        "parameters": [],
+        "category": "system"
+      },
+      {
+        "name": "consultar_api",
+        "description": "Hace petición HTTP a una API",
+        "parameters": ["url", "metodo", "headers", "body", "timeout"],
+        "category": "network"
+      },
+      {
+        "name": "descargar_archivo",
+        "description": "Descarga archivo desde URL (máx 10MB)",
+        "parameters": ["url", "ruta_destino"],
+        "category": "network"
+      },
+      {
+        "name": "comprimir_descomprimir",
+        "description": "Comprime/descomprime archivos",
+        "parameters": ["operacion", "origen", "destino", "formato"],
+        "category": "filesystem"
+      },
+      {
+        "name": "git_operation",
+        "description": "Operaciones git (status, log, diff, branch, remote)",
+        "parameters": ["operacion", "repo_path", "args"],
+        "category": "git"
+      }
+    ],
+    "claudia": [
+      {
+        "name": "claudia_execute",
+        "alias": "claudia",
+        "description": "Ejecuta tarea de código con asistente IA local (Claudia)",
+        "parameters": ["task", "agentic"],
+        "category": "ai",
+        "examples": [
+          "claudia:analiza el archivo main.py",
+          "claudia:explica esta función",
+          "claudia:encuentra bugs en este código"
+        ]
+      },
+      {
+        "name": "claudia_analyze_file",
+        "alias": "claudia_analyze",
+        "description": "Analiza archivo de código con explicación detallada",
+        "parameters": ["file_path", "question"],
+        "category": "ai",
+        "examples": [
+          "claudia_analyze:core/rag_manager.py:qué hace esta clase?",
+          "claudia_analyze:main.py"
+        ]
+      },
+      {
+        "name": "claudia_analyze_project",
+        "alias": "claudia_project",
+        "description": "Análisis completo de proyecto con modo agéntico",
+        "parameters": ["project_path"],
+        "category": "ai",
+        "agentic": true,
+        "examples": [
+          "claudia_project:~/proyecto/wikirag",
+          "claudia_project"
+        ]
+      },
+      {
+        "name": "claudia_run_command",
+        "alias": "claudia_cmd",
+        "description": "Ejecuta comando del sistema via Claudia con contexto IA",
+        "parameters": ["command", "working_dir"],
+        "category": "ai",
+        "examples": [
+          "claudia_cmd:pytest tests/",
+          "claudia_cmd:pip install -r requirements.txt"
+        ]
+      }
+    ]
+  },
+  "agent_aliases": {
+    "claudia": "claudia_execute",
+    "code": "claudia_execute",
+    "analyze": "claudia_analyze_file",
+    "project": "claudia_analyze_project"
+  },
+  "defaults": {
+    "timeout": 30,
+    "max_file_size": "10MB",
+    "claudia_agentic": false,
+    "claudia_subprocess": true
+  }
+}

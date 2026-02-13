@@ -1,0 +1,43 @@
+{
+    "channels": {
+        "telegram": {
+            "name": "telegram",
+            "enabled": true,
+            "credentials": {
+                "bot_token": "YOUR_BOT_TOKEN_FROM_BOTFATHER"
+            },
+            "settings": {
+                "default_recipient": "YOUR_CHAT_ID",
+                "parse_mode": "Markdown"
+            },
+            "rate_limit": 30,
+            "max_message_length": 4096,
+            "supports_attachments": true,
+            "supports_replies": true,
+            "supports_threads": false,
+            "polling_interval": 2
+        },
+        "webhook": {
+            "name": "webhook",
+            "enabled": false,
+            "credentials": {
+                "secret": "your_hmac_secret_for_signature_verification"
+            },
+            "settings": {
+                "listen_port": 8080,
+                "outgoing_url": "https://your-service.com/webhook"
+            },
+            "rate_limit": 60,
+            "max_message_length": 10000,
+            "supports_attachments": true,
+            "supports_replies": false,
+            "supports_threads": false
+        }
+    },
+    "defaults": {
+        "notification_channel": "telegram",
+        "log_level": "INFO",
+        "retry_attempts": 3,
+        "retry_delay": 5
+    }
+}

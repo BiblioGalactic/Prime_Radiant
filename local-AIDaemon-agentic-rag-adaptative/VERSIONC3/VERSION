@@ -1,0 +1,43 @@
+WikiRAG v2.4.0 - VERSIONC3
+============================
+
+Release Date: 2025-02-01
+Codename: "Mental Theater"
+
+This release includes:
+
+## Core Features
+- Multi-strategy RAG system (BM25, FAISS, GraphRAG, Hybrid)
+- Memory-optimized BM25 with lazy loading
+- Smart Router with direct execution
+
+## Agent System
+- Claude-style agent architecture (Thinker, Planner, Executor, Verifier)
+- ReAct agent with tool integration
+- Strategic Agent for task decomposition
+
+## New in v2.4.0
+- Mental Theater: 6-profile deliberation system
+  - Luz (Logic), Sombra (Risk), Luna (Context)
+  - Agua (Adaptation), Fuego (Action), Viento (Alternatives)
+- Event-based Queue System (inbox/processing/archive)
+- Multi-channel Messaging (Telegram, Webhooks)
+- SmartToolDecider with automatic risk blocking
+
+## Requirements
+- Python 3.9+
+- llama.cpp with compatible GGUF model
+- macOS/Linux
+
+## Quick Start
+1. Copy to ~/wikirag/
+2. Create virtual environment: python -m venv venv
+3. Install dependencies: pip install -r requirements.txt
+4. Configure config/mcp_config.json
+5. Run: ./start.sh
+
+## Author
+Gustavo Silva da Costa
+
+## License
+MIT License
