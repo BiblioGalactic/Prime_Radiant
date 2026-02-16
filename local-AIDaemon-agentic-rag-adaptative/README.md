@@ -1,11 +1,21 @@
+# 🔴 AVISO IMPORTANTE: VERSIONES DEPRECADAS
+
+**A partir del 16 de febrero de 2026, las versiones A1, B2, C3 y D4 están DEPRECADAS.**
+
+✅ **Usa VERSIONE5 (E5)** - Es la única versión activa con soporte.
+
+📖 [Leer Guía de Migración](./MIGRATION_GUIDE.md)
+
+---
+
 # WikiRAG v1.0 - Sistema de IA con Agentes y RAGs
 # ==================================================================================
 # Compare responses across multiple LLaMA models with cross-evaluation and response
 # combination. Supports automatic setup and model configuration.
-# 
+#
 # Author: Gustavo Silva da Costa
 # License: MIT
-# Version: 1.0.0
+# Version: 1.0.0 (VERSIONE5 - E5)
 # ==================================================================================
 
 ## 🚀 Arquitectura de Vanguardia

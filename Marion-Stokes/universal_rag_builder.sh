@@ -1,4 +1,4 @@
-#!/opt/homebrew/bin/bash
+#!/usr/bin/env bash
 # ============================================================
 # 🧠 UNIVERSAL KNOWLEDGE RAG BUILDER v2
 # by Eto Demerzel (BiblioGalactic)
@@ -279,9 +279,10 @@ print(f"LISTO: {len(documents)} chunks en {save_dir}")
 PYEOF
 
     # Sustituir placeholders
-    sed -i '' "s|NOMBRE_PLACEHOLDER|$nombre|g" "$script"
-    sed -i '' "s|TXTDIR_PLACEHOLDER|$txt_dir|g" "$script"
-    sed -i '' "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
+    sed -i.bak "s|NOMBRE_PLACEHOLDER|$nombre|g" "$script"
+    sed -i.bak "s|TXTDIR_PLACEHOLDER|$txt_dir|g" "$script"
+    sed -i.bak "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
+    rm -f "${script}.bak"
     ok "Script indexador generado: $script"
 }
 
@@ -351,8 +352,9 @@ with open(os.path.join(save_dir, "metadata.pkl"), "wb") as fp: pickle.dump(metad
 print(f"LISTO: {count} papers, {len(documents)} chunks en {save_dir}")
 PYEOF
 
-    sed -i '' "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
-    sed -i '' "s|JSONFILE_PLACEHOLDER|$json_file|g" "$script"
+    sed -i.bak "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
+    sed -i.bak "s|JSONFILE_PLACEHOLDER|$json_file|g" "$script"
+    rm -f "${script}.bak"
     ok "Script indexador Arxiv generado"
 }
 
@@ -444,8 +446,9 @@ with open(os.path.join(save_dir, "metadata.pkl"), "wb") as fp: pickle.dump(metad
 print(f"LISTO: {len(files)} libros, {len(documents)} chunks en {save_dir}")
 PYEOF
 
-    sed -i '' "s|TXTDIR_PLACEHOLDER|$txt_dir|g" "$script"
-    sed -i '' "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
+    sed -i.bak "s|TXTDIR_PLACEHOLDER|$txt_dir|g" "$script"
+    sed -i.bak "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
+    rm -f "${script}.bak"
     ok "Script indexador Gutenberg generado"
 }
 
@@ -526,8 +529,9 @@ with open(os.path.join(save_dir, "metadata.pkl"), "wb") as fp: pickle.dump(metad
 print(f"LISTO: {count} posts (score>5), {len(documents)} chunks en {save_dir}")
 PYEOF
 
-    sed -i '' "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
-    sed -i '' "s|XMLFILE_PLACEHOLDER|$xml_file|g" "$script"
+    sed -i.bak "s|IDXDIR_PLACEHOLDER|$idx_dir|g" "$script"
+    sed -i.bak "s|XMLFILE_PLACEHOLDER|$xml_file|g" "$script"
+    rm -f "${script}.bak"
     ok "Script indexador Stack Overflow generado"
 }
 

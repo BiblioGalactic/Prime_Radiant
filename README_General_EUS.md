@@ -28,7 +28,7 @@
 ./setup_asistente.sh
 ```
 
-### ⚔️ [Local-CROS (Cross-Referential Optimization)](./local-agentic-asistant/)
+### ⚔️ [Local-CROS (Cross-Referential Optimization)](./local-agentic-assistant/)
 **Modeloen arteko gurutzatutako ebaluazio sistema**
 
 - LLaMA modelo anitzen erantzunak konparatzen ditu
@@ -80,7 +80,7 @@ wget https://huggingface.co/TheBloke/Mistral-7B-Instruct-v0.1-GGUF/resolve/main/
 | Tresna | Helburua | Egoera |
 |-------------|-----------|--------|
 | [Local AI Assistant](./local-ai-assistant/) | Laguntzaile agentiko osoa | ✅ Egonkorra |
-| [Local-CROS](./local-agentic-asistant/) | Modelen konparatzailea | ✅ Egonkorra |
+| [Local-CROS](./local-agentic-assistant/) | Modelen konparatzailea | ✅ Egonkorra |
 
 ---
 
