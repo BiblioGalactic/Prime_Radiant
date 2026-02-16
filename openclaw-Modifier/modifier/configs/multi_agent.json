@@ -1,0 +1,64 @@
+{
+  "models": {
+    "default": "daneel-local",
+    "providers": {
+      "daneel-local": {
+        "type": "openai-compat",
+        "baseUrl": "http://127.0.0.1:8080/v1",
+        "model": "local-model",
+        "apiKey": "not-needed"
+      },
+      "dors-local": {
+        "type": "openai-compat",
+        "baseUrl": "http://127.0.0.1:8081/v1",
+        "model": "local-model",
+        "apiKey": "not-needed"
+      },
+      "giskard-local": {
+        "type": "openai-compat",
+        "baseUrl": "http://127.0.0.1:8082/v1",
+        "model": "local-model",
+        "apiKey": "not-needed"
+      }
+    }
+  },
+  "agents": {
+    "daneel": {
+      "workspace": "~/.openclaw/workspace-daneel",
+      "model": "daneel-local",
+      "description": "Estratega sereno - Análisis y planificación"
+    },
+    "dors": {
+      "workspace": "~/.openclaw/workspace-dors",
+      "model": "dors-local",
+      "description": "Protectora maternal - Seguridad y validación"
+    },
+    "giskard": {
+      "workspace": "~/.openclaw/workspace-giskard",
+      "model": "giskard-local",
+      "description": "Filósofo dubitativo - Reflexión y ética"
+    }
+  },
+  "bindings": {
+    "whatsapp": {
+      "agent": "daneel",
+      "enabled": true
+    },
+    "telegram": {
+      "agent": "dors",
+      "enabled": true
+    },
+    "discord": {
+      "agent": "giskard",
+      "enabled": true
+    }
+  },
+  "gateway": {
+    "port": 3000,
+    "host": "127.0.0.1"
+  },
+  "logging": {
+    "level": "info",
+    "directory": "~/.openclaw/logs"
+  }
+}

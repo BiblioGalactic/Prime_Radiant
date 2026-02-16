@@ -1,0 +1,27 @@
+{
+  "models": {
+    "default": "{{MODEL_NAME}}-local",
+    "providers": {
+      "{{MODEL_NAME}}-local": {
+        "type": "openai-compat",
+        "baseUrl": "http://127.0.0.1:{{BASE_PORT}}/v1",
+        "model": "local-model",
+        "apiKey": "not-needed"
+      }
+    }
+  },
+  "agents": {
+    "default": {
+      "workspace": "~/.openclaw/workspace-{{MODEL_NAME}}",
+      "model": "{{MODEL_NAME}}-local"
+    }
+  },
+  "gateway": {
+    "port": 3000,
+    "host": "127.0.0.1"
+  },
+  "logging": {
+    "level": "info",
+    "directory": "~/.openclaw/logs"
+  }
+}
