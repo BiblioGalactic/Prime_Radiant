@@ -48,10 +48,52 @@ MODEL_PATH="${MODEL_PATH:-}"
 LLAMA_BIN="${LLAMA_BIN:-$HOME/modelo/llama.cpp/build/bin/llama-server}"
 CONTEXT_SIZE="${CONTEXT_SIZE:-4096}"
 THREADS="${THREADS:-8}"
+LOCK_FILE="${LOCK_FILE:-$HOME/.openclaw/multi-agent.lock}"
+LOCK_FALLBACK_DIR="${LOCK_FALLBACK_DIR:-$HOME/.openclaw/multi-agent.lockdir}"
+LOCK_METHOD=""
 
 # ============================================
 # Funciones
 # ============================================
+
+acquire_start_lock() {
+    mkdir -p "$(dirname "$LOCK_FILE")"
+
+    if command -v flock >/dev/null 2>&1; then
+        exec 200>"$LOCK_FILE"
+        if ! flock -n 200; then
+            echo -e "${RED}❌ Error: otra instancia de start_multi_agent ya está ejecutándose.${NC}"
+            echo -e "${YELLOW}ℹ${NC}  Lock ocupado: $LOCK_FILE"
+            exit 1
+        fi
+        LOCK_METHOD="flock"
+        echo -e "${GREEN}✓${NC} Lock adquirido (flock): $LOCK_FILE"
+        return
+    fi
+
+    if mkdir "$LOCK_FALLBACK_DIR" 2>/dev/null; then
+        LOCK_METHOD="mkdir"
+        echo -e "${YELLOW}⚠${NC} flock no disponible; lock adquirido con directorio: $LOCK_FALLBACK_DIR"
+        return
+    fi
+
+    echo -e "${RED}❌ Error: otra instancia parece activa (lock por directorio ocupado).${NC}"
+    echo -e "${YELLOW}ℹ${NC}  Lock ocupado: $LOCK_FALLBACK_DIR"
+    exit 1
+}
+
+release_start_lock() {
+    case "$LOCK_METHOD" in
+        flock)
+            flock -u 200 2>/dev/null || true
+            exec 200>&- || true
+            ;;
+        mkdir)
+            rmdir "$LOCK_FALLBACK_DIR" 2>/dev/null || true
+            ;;
+    esac
+    LOCK_METHOD=""
+}
 
 cleanup() {
     echo ""
@@ -72,6 +114,8 @@ cleanup() {
             rm -f "$pid_file"
         fi
     done
+
+    release_start_lock
 
     echo -e "${GREEN}✓${NC} Limpieza completa"
 }
@@ -273,6 +317,8 @@ echo "=================================================="
 echo "🚀 MULTI-AGENT - OpenClaw + llama.cpp"
 echo "=================================================="
 echo ""
+
+acquire_start_lock
 
 validar
 
