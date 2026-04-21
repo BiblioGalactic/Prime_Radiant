@@ -22,6 +22,7 @@ Componentes a verificar:
 import os
 import sys
 import time
+import pytest
 
 # Setup paths
 BASE_DIR = os.path.expanduser("~/wikirag")
@@ -35,6 +36,8 @@ YELLOW = '\033[93m'
 CYAN = '\033[96m'
 RESET = '\033[0m'
 BOLD = '\033[1m'
+
+pytestmark = pytest.mark.filterwarnings("ignore::pytest.PytestReturnNotNoneWarning")
 
 
 def print_header(title: str):

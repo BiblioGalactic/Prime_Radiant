@@ -182,6 +182,13 @@ class ModelRouter:
             min_complexity_score=20  # Consultas medias+
         ),
 
+        "hermes2pro": ModelSpec(
+            name="hermes2pro",
+            path=os.path.expanduser("~/modelo/modelos_grandes/agentes/nosaltres-hermes-2-pro.Q5_K_M.gguf"),
+            tasks=[TaskType.AGENT, TaskType.PLANNING, TaskType.COMPLEX],
+            languages=[Language.ENGLISH, Language.SPANISH],
+            ctx_size=4096,
+            n_predict=1000,
             temperature=0.5,
             priority=3,
             description="Decisiones, gestión, agentes",

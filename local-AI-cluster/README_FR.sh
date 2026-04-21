@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+cat <<'EOF'
 🤖 AI Cluster – Système Distribué d’Intelligence Artificielle
 
 Traite des requêtes d’IA en parallèle à l’aide de plusieurs machines de ton réseau local (intranet).
@@ -295,3 +297,4 @@ de dysfonctionnements matériels ou de tout dommage lié à son usage.
 ⸻
 
 Si ce projet t’est utile, laisse-lui une ⭐ sur GitHub !
+EOF

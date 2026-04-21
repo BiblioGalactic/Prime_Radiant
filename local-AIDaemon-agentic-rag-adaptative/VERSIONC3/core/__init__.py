@@ -15,9 +15,14 @@ if BASE_DIR not in sys.path:
 from core.config import Config, config
 from core.queue_manager import QueueManager, QueueMessage, Priority
 from core.daemon_interface import DaemonInterface, DaemonCLI
-from core.rag_manager import RAGManager
 from core.evaluator import ResponseEvaluator, HeuristicEvaluator, Verdict, create_evaluator
 from core.shared_state import SharedState, get_shared_state
+
+RAGManager = None
+try:
+    from core.rag_manager import RAGManager
+except (ImportError, NameError, Exception):
+    pass
 
 # === Vanguardia 2024-2025 ===
 # Imports opcionales - no fallan si dependencias no están instaladas

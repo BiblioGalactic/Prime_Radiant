@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+cat <<'EOF'
 # 🤖 AI Cluster - IA Sistema Banatua
 
 **Prozesatu IA kontsultak paraleloan zure sare lokaleko (intranet) makina anitz erabiliz.**
@@ -319,3 +321,4 @@ Software hau "dagoen bezala" ematen da, bermerik gabe. Erabilera zure erantzukiz
 ---
 
 **Proiektu honek lagundu badizu, eman ⭐ bat GitHub-en**
+EOF

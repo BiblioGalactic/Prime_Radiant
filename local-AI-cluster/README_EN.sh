@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+cat <<'EOF'
 # 🤖 AI Cluster - Distributed AI System
 
 **Process AI queries in parallel using multiple machines on your local network (intranet).**
@@ -319,3 +321,4 @@ This software is provided "as is", without warranties. Use at your own risk. The
 ---
 
 **If you find this project useful, give it a ⭐ on GitHub**
+EOF

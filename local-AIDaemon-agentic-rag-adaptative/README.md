@@ -1,149 +1,43 @@
-# 🔴 AVISO IMPORTANTE: VERSIONES DEPRECADAS
+# WikiRAG - estado actual
 
-**A partir del 16 de febrero de 2026, las versiones A1, B2, C3 y D4 están DEPRECADAS.**
+## Antes de entrar
 
-✅ **Usa VERSIONE5 (E5)** - Es la única versión activa con soporte.
+A fecha de febrero de 2026, A1, B2, C3 y D4 estan deprecadas. La linea activa es E5.
 
-📖 [Leer Guía de Migración](./MIGRATION_GUIDE.md)
+No elimine las versiones viejas porque cada una me dejo una leccion distinta: router de modelos, colas, mensajeria, memoria o empaquetado. El coste de mantenerlas visibles es el ruido. El beneficio es que no tengo que reexplicar por que tome ciertas decisiones.
 
----
+## Que intenta resolver este sistema
 
-# WikiRAG v1.0 - Sistema de IA con Agentes y RAGs
-# ==================================================================================
-# Compare responses across multiple LLaMA models with cross-evaluation and response
-# combination. Supports automatic setup and model configuration.
-#
-# Author: Gustavo Silva da Costa
-# License: MIT
-# Version: 1.0.0 (VERSIONE5 - E5)
-# ==================================================================================
+Queria un stack local que no fuese solo "pregunta a un modelo y ya". Necesitaba:
 
-## 🚀 Arquitectura de Vanguardia
+- colas,
+- criterios de seleccion de modelo,
+- memoria,
+- RAG,
+- agentes,
+- y la posibilidad de degradar el sistema sin apagarlo entero.
 
-Sistema local de IA que combina:
-- **RAG Adaptativo**: Estrategias broad/focused/balanced/iterative
-- **Multi-Modelo**: 12+ modelos GGUF con selección inteligente
-- **Sistema de Triaje**: Modelos grandes como último recurso
-- **Memoria a Largo Plazo**: Episódica, semántica, procedural
-- **Agentes ReAct**: Razonamiento paso a paso
+Por eso esta carpeta acabo creciendo mas de la cuenta.
 
-## 📁 Estructura
+## Como esta organizado
 
-```
-VERSIONA1/
-├── core/                 # Núcleo del sistema
-│   ├── orchestrator.py   # Orquestador principal
-│   ├── daemon_interface.py # Interface con llama-cli
-│   ├── rag_manager.py    # Gestión de RAGs
-│   ├── model_router.py   # Selección inteligente de modelos
-│   ├── evaluator.py      # Evaluación de respuestas
-│   ├── query_refiner.py  # Refinamiento de queries
-│   ├── critic.py         # Crítico de respuestas
-│   ├── memory.py         # Memoria a largo plazo
-│   ├── prompts.py        # Templates CoT/ReAct
-│   └── config.py         # Configuración
-├── agents/               # Sistema de agentes
-│   ├── react_agent.py    # Agente ReAct
-│   ├── rag_agent.py      # Agente RAG especializado
-│   ├── plan_cache.py     # Cache de planes
-│   ├── planner.py        # Planificador
-│   └── executor.py       # Ejecutor de planes
-└── scripts/              # Scripts de inicio
-    └── start_orchestrator.sh
-```
+- `VERSIONE5/`: rama activa.
+- `VERSIONA1` a `VERSIOND4/`: historial de arquitectura, migraciones y errores ya pagados.
+- `MIGRATION_GUIDE.md`: puente entre generaciones.
 
-## ⚙️ Configuración
+## Numeros que si puedo afirmar
 
-### Rutas de Modelos
+- cinco generaciones visibles: A1, B2, C3, D4 y E5,
+- `VERSIONC3` conserva 19 tests en verde.
 
-Editar `core/config.py`:
+## Lo que aprendi y no quiero ocultar
 
-```python
-# Ruta base de modelos
-MODELOS_BASE = os.path.expanduser("~/modelo/modelos_grandes")
+- meter demasiadas capacidades en una sola version vuelve difusa la frontera entre producto y laboratorio,
+- el router de modelos merece existir porque no todos los prompts justifican el mismo coste,
+- mantener versiones deprecadas es feo, pero me ha ahorrado rehacer errores por segunda vez.
 
-# llama-cli
-LLAMA_CLI = os.path.expanduser("~/modelo/llama.cpp/build/bin/llama-cli")
-```
+## Si quieres usarlo hoy
 
-### Sistema de Triaje
+Empieza por E5.
 
-Los modelos se clasifican en tiers:
-
-| Tier | Parámetros | Uso | Throttle |
-|------|------------|-----|----------|
-| TINY | <2B | Evaluación rápida | 0ms |
-| SMALL | 2-7B | Default | 0ms |
-| MEDIUM | 7-13B | Consultas medias | 0ms |
-| LARGE | 13-30B | Consultas complejas | 20ms |
-| GIANT | 30B+ | ÚLTIMO RECURSO | 100ms |
-
-**Puntuación de Triaje**:
-```
-score = complejidad × 10 + fallos_previos × 25
-```
-
-- Score < 30: TINY/SMALL
-- Score 30-59: MEDIUM permitido
-- Score 60-94: LARGE permitido
-- Score 95+: GIANT permitido (casi imposible sin múltiples fallos)
-
-## 🚀 Uso
-
-### Modo Interactivo
-
-```bash
-cd scripts
-./start_orchestrator.sh -i
-```
-
-### Comandos
-
-```
-salir         - Terminar
-status        - Ver estado del sistema
-adaptive on   - Activar modo adaptativo
-adaptive off  - Desactivar modo adaptativo
-```
-
-## 🔧 Dependencias
-
-```bash
-pip install sentence-transformers faiss-cpu numpy
-```
-
-## 📊 Características
-
-### RAG Adaptativo
-
-- **BROAD**: k=50, exploración amplia
-- **FOCUSED**: k=10, precisión alta
-- **BALANCED**: k=20, balance
-- **ITERATIVE**: Refinamiento recursivo
-
-### Memoria a Largo Plazo
-
-- **Episódica**: Guarda (query, response, rating)
-- **Semántica**: Conocimiento extraído
-- **Procedural**: Planes exitosos
-
-### Agente ReAct
-
-Ciclo Thought → Action → Observation:
-- SEARCH: Buscar en RAG
-- LOOKUP: Buscar término
-- CALCULATE: Cálculo matemático
-- VERIFY: Verificar información
-- ANSWER: Respuesta final
-
-## 📝 Versión
-
-- **Versión**: A1 (Alpha 1)
-- **Fecha**: Enero 2026
-- **Autor**: Sistema WikiRAG
-
-## ⚠️ Notas
-
-- Los modelos GIANT (70B+) requieren puntuación 95+ para activarse
-- El throttle en modelos grandes evita sobrecarga de RAM
-- La terminal se restaura automáticamente después de cada consulta
+Si algo de E5 te resulta incomprensible, entonces baja a C3 o D4 para entender la evolucion, no para desplegarlo.

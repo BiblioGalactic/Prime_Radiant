@@ -1,134 +1,46 @@
-Setup Automatizado para Asistente IA Local
+# Prime_Radiant
 
-Descripción
+## Que es este repo
 
-Este script de instalación automatizada configura un Asistente IA Local completo que utiliza modelos de lenguaje locales a través de llama.cpp. El asistente está inspirado en Claude Code pero funciona completamente offline con modelos GGUF.
+`Prime_Radiant` es el sitio donde fui dejando los sistemas mas ambiciosos del workspace cuando ya no cabian en un script suelto. Aqui conviven asistentes locales, daemons con RAG, MCP, evaluacion cruzada, cluster y utilidades de memoria. No lo presento como un producto unico porque no lo es; es un repositorio de trabajo con varias lineas, algunas activas y otras historicas.
 
-Características del Asistente
+La ventaja de haberlo dejado asi es que las decisiones siguen visibles. El coste tambien: hay carpetas muy maduras al lado de otras que son claramente laboratorio.
 
-Interfaz interactiva: Modo conversacional con historial de diálogo
-Ejecución de comandos: Capacidad para ejecutar comandos del sistema de forma segura
-Gestión de archivos: Lectura, escritura y análisis de código fuente
-Configuración flexible: Adaptable a diferentes modelos y configuraciones
-Sistema de logs: Registro detallado de todas las operaciones
-Requisitos
+## Lo que sigue vivo
 
-Entorno de llama.cpp: Debe tener compilado el proyecto y disponer del binario llama-cli
-Modelo GGUF: Necesitará un modelo de lenguaje en formato .gguf (Mistral, Llama2, etc.)
-Python 3.11+: Intérprete de Python con pip para gestionar dependencias
-Herramientas básicas: bash, git, y herramientas de compilación para posibles extensiones
-Estructura del Proyecto
+- `local-AIDaemon-agentic-rag-adaptative/`
+- `local-agentic-MCP/`
+- `local-cross-eval-synth/`
+- `local-agentic-assistant/`
+- `local-AI-cluster/`
 
-El script crea la siguiente estructura de directorios:
+La rama mas pesada es `local-AIDaemon-agentic-rag-adaptative/`, donde deje cinco generaciones visibles: A1, B2, C3, D4 y E5. No las borre al deprecarlas porque en ese historial estan las decisiones que salieron caras.
 
-text
-asistente-ia/
-├── src/
-│   ├── core/           # Núcleo del asistente (assistant.py, config.py)
-│   ├── llm/            # Cliente para llama.cpp (client.py)
-│   ├── file_ops/       # Gestión de archivos (manager.py)
-│   └── commands/       # Ejecutor de comandos (runner.py)
-├── config/
-│   ├── settings.json   # Configuración principal
-│   └── prompts/        # Plantillas de prompts
-├── tools/              # Herramientas adicionales
-├── tests/              # Tests unitarios
-├── logs/               # Logs de ejecución
-└── examples/           # Ejemplos de uso
-Instalación
+## Estado verificable
 
-Para utilizar el asistente, ejecute el script de instalación:
+- `VERSIONC3` mantiene 19 tests en verde.
+- A1-D4 siguen presentes como referencia historica y para migracion.
 
-bash
-# Dar permisos de ejecución
-chmod +x setup_asistente.sh
+## Por donde empezaria yo hoy
 
-# Ejecutar el script
-./setup_asistente.sh
-Durante la instalación, el script solicitará:
+Si quieres un sistema mas "producto":
 
-Directorio del proyecto: Donde se instalará el asistente
-Ruta del modelo GGUF: Ubicación de su modelo de lenguaje
-Ruta de llama-cli: Ubicación del binario de llama.cpp
-Uso
+1. mira `local-AIDaemon-agentic-rag-adaptative/`,
+2. usa E5 como rama activa,
+3. consulta las versiones viejas solo para entender por que se cambio algo.
 
-Una vez instalado, puede utilizar el asistente de varias formas:
+Si quieres algo mas pequeno y utilitario:
 
-Modo interactivo
+- `local-cross-eval-synth/` para comparar 2-4 modelos,
+- `local-agentic-assistant/` para instalar un asistente local en una maquina nueva,
+- `local-AI-cluster/` si tu problema es repartir carga en red local.
 
-bash
-cd asistente-ia
-python3 src/main.py
-Ejecución de comando único
+## Por que no lo limpie mas
 
-bash
-python3 src/main.py "explica el archivo main.py"
-Con configuración personalizada
+Porque aqui la "limpieza" total borraria informacion util. Hay nombres raros, README repetidos por idioma y versiones deprecadas que no son bonitas. Prefiero dejar la cicatriz visible a fingir que todo salio lineal.
 
-bash
-python3 src/main.py -c config/mi_config.json
-Configuración
+## Deuda honesta
 
-El archivo principal de configuración (config/settings.json) incluye:
-
-Rutas a modelo y binario de llama.cpp
-Parámetros del modelo (temperatura, tokens máximos)
-Modo seguro para ejecución de comandos
-Extensiones de archivo soportadas
-Configuración de logging
-Personalización de Rutas
-
-Los scripts usan rutas absolutas para mayor flexibilidad. Si necesita modificar las rutas después de la instalación:
-
-Edite el archivo config/settings.json
-O ejecute nuevamente el script de setup para reconfigurar
-Descarga de Modelos
-
-Si no tiene un modelo GGUF, puede descargar uno desde:
-
-Hugging Face
-TheBloke's models
-Recomendamos modelos como:
-
-Mistral-7B-Instruct-v0.1
-Llama-2-7B-Chat
-CodeLlama-7B-Instruct
-Notas Técnicas
-
-El asistente funciona completamente offline una vez instalado
-Todos los procesamientos se realizan localmente
-Los logs se guardan con marcas de tiempo para diagnóstico
-El modo seguro restringe comandos potencialmente peligrosos
-Solución de Problemas
-
-Error: "llama-cli no encontrado"
-
-Verifique que llama.cpp esté compilado correctamente:
-
-bash
-cd llama.cpp
-make clean
-make
-Error: "Modelo no encontrado"
-
-Descargue un modelo GGUF y actualice la ruta en config/settings.json
-
-Error: Dependencias faltantes
-
-Instale las dependencias requeridas:
-
-bash
-pip install -r requirements.txt
-Contribución
-
-Este proyecto sigue normas estrictas de estilo para:
-
-Cabeceras de scripts y documentación
-Validaciones y comprobaciones de errores
-Gestión segura de recursos
-Limpieza y mantenimiento de código
-Licencia
-
-Proyecto de código abierto para uso educativo y experimental.
-
-Para más información, consulte los archivos README.md específicos en cada directorio del proyecto.
+- No todos los modulos comparten el mismo nivel de madurez.
+- Algunos README nacieron como folleto tecnico y he ido corrigiendo eso solo en las puertas de entrada mas importantes.
+- Varias piezas siguen asumiendo rutas locales de `llama.cpp` y modelos GGUF; esa dependencia es deliberada, no un olvido.

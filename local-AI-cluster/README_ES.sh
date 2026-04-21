@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+cat <<'EOF'
 # 🤖 AI Cluster - Sistema Distribuido de IA
 
 **Procesa queries de IA en paralelo usando múltiples máquinas en tu red local (intranet).**
@@ -319,3 +321,4 @@ Este software se proporciona "tal cual", sin garantías. Úsalo bajo tu propia r
 ---
 
 **Si este proyecto te resulta útil, dale una ⭐ en GitHub**
+EOF

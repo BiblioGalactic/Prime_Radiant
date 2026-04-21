@@ -11,6 +11,7 @@ integrada como herramienta MCP.
 import os
 import sys
 import json
+import pytest
 
 # Setup paths - detectar automáticamente
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -22,6 +23,8 @@ if BASE_DIR not in sys.path:
 
 # Para imports relativos dentro del proyecto
 os.chdir(BASE_DIR)
+
+pytestmark = pytest.mark.filterwarnings("ignore::pytest.PytestReturnNotNoneWarning")
 
 
 def test_imports():
