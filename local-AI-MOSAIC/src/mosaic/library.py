@@ -43,11 +43,20 @@ class CapabilityLibrary:
     def from_dir(cls, path: str | Path) -> "CapabilityLibrary":
         lib = cls()
         for f in sorted(Path(path).glob("**/*.y*ml")):
-            data = yaml.safe_load(f.read_text()) or {}
-            items = data if isinstance(data, list) else data.get("capabilities", [data])
+            try:
+                data = yaml.safe_load(f.read_text()) or {}
+            except Exception:
+                continue  # skip an unparseable file instead of failing the whole load
+            # Only accept files with a 'capabilities:' list (or a bare list). Any other
+            # YAML in the directory (e.g. a rejected-capabilities log) is ignored rather
+            # than being mis-parsed into a Capability and crashing the load.
+            items = data if isinstance(data, list) else data.get("capabilities", [])
             for item in items:
-                if item:
-                    lib.add(Capability(**item))
+                if isinstance(item, dict) and item.get("id"):
+                    try:
+                        lib.add(Capability(**item))
+                    except Exception:
+                        pass  # unknown keys -> skip that item, don't break everything
         return lib
 
     def find_similar(self, cap: Capability, by_domain: bool = True,

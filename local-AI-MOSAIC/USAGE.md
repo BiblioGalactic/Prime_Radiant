@@ -78,4 +78,23 @@ entry follows the Appendix A schema; `id`s are referenced by
 `compatible_capabilities` / `incompatible_capabilities` / `required_capabilities`.
 Learned state (scores, synergies) is persisted separately to `data/state.json`,
 so editing a capability's text never erases its learning.
+
+## What evolved (lessons from running it for real)
+
+Running MOSAIC continuously surfaced refinements worth recording; they also live, as a
+closed self-cultivating loop, in the sibling project [Symbiont](../local-AI-Symbiont/):
+
+- **Off-domain fallback.** When nothing in the library fits a request, force-fitting a
+  code-shaped agent onto (say) a housing question produces nonsense. The composer now
+  detects "no capability fits" and falls back to a plain general assistant.
+- **Corrective gate + self-extension.** Before composing, the system checks whether the
+  retrieved capabilities actually fit (a CRAG-style quality gate); if they don't, it
+  records a *gap* and later turns that gap into a new capability it writes itself.
+- **Capability curation.** A library that writes its own capabilities will also write
+  weak ones. New capabilities are scored by a judge before admission and redundant ones
+  pruned; generation prompts were tightened to yield *general rules*, not request-specific recipes.
+- **Robust loading.** `from_dir` now ignores non-capability YAML (e.g. a rejected-
+  capabilities log) instead of crashing the whole load — a real bug fixed in this reference.
+- **A stop condition.** "Self-improving" needs a definition of *improved enough*: track the
+  judge's score trend and the gap-discovery rate; when both flatten, declare maturity.
 ```

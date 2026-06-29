@@ -29,6 +29,18 @@ This work establishes priority for the MOSAIC paradigm and provides comprehensiv
 
 ---
 
+## Why this matters in practice: a portable mask of competence
+
+Beyond the architecture, MOSAIC has a consequence worth stating plainly. The artifact it produces is **not a model** — it is the **capability library**: a set of model-agnostic, retrievable instructions that behaves like a *mask of competence*.
+
+Conventional distillation compresses a strong model into another model's **weights** — costly, and bolted to one model. MOSAIC distills competence into **prompts** — into the library — so it is **portable across models without retraining**. The workflow this enables is two-phase: cultivate the library once with strong models and an independent judge; then a smaller, weaker model *wearing the composed prompt* performs well above its naive baseline, within covered domains.
+
+**The honest ceiling:** this raises a weak model's *floor and consistency* — it does not erase model capacity. A great prompt will not make a tiny model reason like a large one; the mask makes a model reliably *reach* its own ceiling, not exceed it. And it is measurable: composing-vs-raw on the same weak model is exactly how much the mask adds.
+
+*In short: MOSAIC is not the product — the cultivated library is. MOSAIC is how you grow it.*
+
+---
+
 ## 1. Introduction: The Agent Composition Problem
 
 ### 1.1 Current State of Agentic AI Architectures

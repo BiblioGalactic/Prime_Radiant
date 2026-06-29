@@ -919,6 +919,54 @@ Contains:
 
 ---
 
+## Addendum (v1.1, June 2026): From Composition to Self-Extension — the Corrective Loop
+
+The original paper (v1.0) formalized TADPA as *dynamic prompt assembly from a fixed,
+human-curated fragment library*. Implementation surfaced a natural and important
+extension: the library need not be fixed, and retrieval quality can be made
+**self-aware**. This addendum records that evolution.
+
+### A.1 The corrective gate
+Pure retrieval is optimistic: it always returns its top-k, even when the top-k is a poor
+fit. We insert a gate between retrieval and assembly that asks a blunt question — *do the
+retrieved fragments actually cover this request?* — scoring the semantic fit of the
+retrieved set and the coverage of the request's inferred metadata. Three outcomes:
+
+- **fit** → compose normally;
+- **weak** → re-retrieve with relaxed filters / wider k (the "corrective" step — Corrective
+  RAG applied to *instructions*, not documents);
+- **miss** → record a **gap**.
+
+### A.2 Gaps as specifications
+A gap is not an error to swallow; it is a precise statement of *what the library cannot yet
+do*. Each gap (the request plus its inferred domains) is logged as a seed.
+
+### A.3 Self-extension
+Periodically a strong model reads the accumulated gaps and **writes new fragments** to
+cover them — general, reusable instructions, not answers to the specific requests. This
+closes TADPA's loop: the library that *composes* the prompts also *grows* the prompts it
+can compose. The fragment library becomes an organ that regenerates.
+
+### A.4 Curation (the necessary brake)
+A library that writes its own fragments will, unchecked, also write mediocre ones. Two
+brakes keep quality from drifting: **admission curation** (a judge scores each new fragment
+for generality and reusability *before* it enters; low scores are rejected and logged, never
+silently deleted) and **redundancy pruning** (near-duplicates are archived so retrieval
+stays sharp).
+
+### A.5 Atomicity (a correctness note)
+The gap log and the usage history are claimed by **atomic rename** before processing, so
+entries that arrive *during* a consolidation pass are not lost to a truncating write — a
+small but real data-integrity fix.
+
+### A.6 Where this leads
+With a corrective gate, gap-driven self-extension, and curation, TADPA stops being a
+*static* composition system and becomes a *cultivating* one. The full closed loop —
+self-feeding inputs, an independent cross-machine judge, and a maturity stop-condition — is
+described in the **Symbiont** whitepaper elsewhere in this repository.
+
+---
+
 **Document Status**: Priority Claim  
 **License**: CC BY 4.0 (Attribution Required)  
 **Citation**: 
@@ -950,6 +998,7 @@ This work was inspired by Anthropic's Contextual Retrieval technique and builds 
 **Version History**
 
 - v1.0 (October 15, 2025): Initial publication establishing priority claim and technical specification
+- v1.1 (June 29, 2026): Addendum — corrective gate, gap-driven self-extension, curation, and atomicity (see above)
 
 ---
 
