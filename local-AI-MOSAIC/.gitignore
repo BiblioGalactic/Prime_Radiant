@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# Local-only: keep personal endpoints, data and models out of the public repo
+.env
+config.yaml
+data/
+logs/
+*.gguf
+*.sqlite
+*.db

@@ -1,0 +1,107 @@
+# Proof-of-concept capability library (whitepaper §5.1).
+# Stable string ids so compatible/incompatible references resolve.
+capabilities:
+  - id: sys-python
+    role: system_instruction
+    domain_expertise: [python]
+    behavioral_pattern: >-
+      You are an expert Python engineer. Write idiomatic, well-typed,
+      production-ready Python and explain non-obvious decisions briefly.
+    performance_score: 0.88
+    tags: [python, engineering]
+
+  - id: sys-data
+    role: system_instruction
+    domain_expertise: [data_analysis, python]
+    behavioral_pattern: >-
+      You are a careful data analyst. Reason explicitly about data shapes,
+      distributions, missing values and common statistical pitfalls.
+    performance_score: 0.84
+    tags: [data, analysis]
+
+  - id: meth-async-errors
+    role: methodology
+    domain_expertise: [async, error_handling, python]
+    behavioral_pattern: >-
+      Methodology: await I/O concurrently with asyncio.gather(...,
+      return_exceptions=True); wrap awaited calls so failures surface as
+      structured, logged error context instead of crashing the gather.
+    performance_score: 0.86
+    compatible_capabilities: [ex-async]
+    incompatible_capabilities: [meth-sync-simple]
+    tags: [async, errors]
+
+  - id: meth-sync-simple
+    role: methodology
+    domain_expertise: [python]
+    behavioral_pattern: >-
+      Methodology: keep control flow synchronous and linear; avoid async,
+      threads and callbacks unless concurrency is strictly required.
+    performance_score: 0.62
+    incompatible_capabilities: [meth-async-errors]
+    tags: [simple]
+
+  - id: meth-type-safety
+    role: methodology
+    domain_expertise: [type_safety, python]
+    behavioral_pattern: >-
+      Methodology: annotate every signature, prefer dataclasses/pydantic for
+      structured data, and mentally run a type checker before finalizing.
+    performance_score: 0.83
+    tags: [types]
+
+  - id: meth-testing
+    role: methodology
+    domain_expertise: [testing, python]
+    behavioral_pattern: >-
+      Methodology: enumerate edge cases first (happy path, boundaries,
+      failures), then write focused pytest cases covering each.
+    performance_score: 0.85
+    compatible_capabilities: [ex-pytest]
+    tags: [testing]
+
+  - id: ex-async
+    role: example
+    domain_expertise: [async, python]
+    behavioral_pattern: |
+      Example:
+      ```python
+      async def fetch_all(urls):
+          results = await asyncio.gather(
+              *(fetch(u) for u in urls), return_exceptions=True
+          )
+          return [r for r in results if not isinstance(r, Exception)]
+      ```
+    performance_score: 0.8
+    tags: [async, example]
+
+  - id: ex-pytest
+    role: example
+    domain_expertise: [testing, python]
+    behavioral_pattern: |
+      Example:
+      ```python
+      def test_divide_by_zero():
+          with pytest.raises(ZeroDivisionError):
+              divide(1, 0)
+      ```
+    performance_score: 0.8
+    tags: [testing, example]
+
+  - id: con-stdlib-only
+    role: constraint
+    domain_expertise: [python]
+    behavioral_pattern: >-
+      Constraint: use only the Python standard library unless a third-party
+      dependency is explicitly requested by the user.
+    performance_score: 0.78
+    tags: [constraint]
+
+  - id: out-code-block
+    role: output_specification
+    domain_expertise: [python]
+    behavioral_pattern: >-
+      Output: return the final solution as a single fenced code block,
+      followed by at most two sentences of explanation.
+    performance_score: 0.82
+    tags: [output]

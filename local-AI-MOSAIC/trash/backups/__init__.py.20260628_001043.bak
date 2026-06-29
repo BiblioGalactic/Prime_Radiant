@@ -1,0 +1,9 @@
+"""MOSAIC: Modular Orchestration System for Agent Intelligence Composition.
+
+Local-first reference implementation. Agents are ephemeral compositions of
+persistent, evolvable capabilities retrieved from a shared library.
+"""
+from mosaic.schema import Capability, ComplexityLevel, Role
+
+__all__ = ["Capability", "Role", "ComplexityLevel"]
+__version__ = "0.1.0"

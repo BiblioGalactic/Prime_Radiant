@@ -1,0 +1,27 @@
+"""MOSAIC: Modular Orchestration System for Agent Intelligence Composition.
+
+Local-first reference implementation. Agents are ephemeral compositions of
+persistent, evolvable capabilities retrieved from a shared library.
+"""
+from mosaic.agent import AgentSpecification, EphemeralAgent
+from mosaic.config import MosaicConfig
+from mosaic.contextualize import Contextualizer
+from mosaic.engine import MosaicEngine
+from mosaic.graph import CompatibilityGraph
+from mosaic.intent import Intent, IntentAnalyzer
+from mosaic.library import CapabilityLibrary
+from mosaic.llm import MockLLM, OpenAICompatibleLLM
+from mosaic.orchestrator import AgentOrchestrator
+from mosaic.retrieval import HybridRetriever
+from mosaic.schema import Capability, ComplexityLevel, Role
+
+__all__ = [
+    "Capability", "Role", "ComplexityLevel",
+    "CapabilityLibrary", "CompatibilityGraph",
+    "Intent", "IntentAnalyzer",
+    "HybridRetriever", "AgentOrchestrator", "Contextualizer",
+    "AgentSpecification", "EphemeralAgent",
+    "MosaicConfig", "MosaicEngine",
+    "MockLLM", "OpenAICompatibleLLM",
+]
+__version__ = "0.1.0"

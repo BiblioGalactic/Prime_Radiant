@@ -1,0 +1,100 @@
+"""MosaicEngine: the end-to-end loop.
+
+intent analysis -> hybrid retrieval -> compatibility-aware composition ->
+(optional) execution -> evolutionary feedback. This is the object most callers
+use; everything else is a component it wires together.
+"""
+from __future__ import annotations
+
+from typing import Optional
+
+from mosaic.config import MosaicConfig
+from mosaic.contextualize import Contextualizer
+from mosaic.embeddings import Embedder, build_embedder
+from mosaic.evolution import CapabilityEvolutionEngine
+from mosaic.graph import CompatibilityGraph
+from mosaic.intent import Intent, IntentAnalyzer
+from mosaic.library import CapabilityLibrary
+from mosaic.llm import LLMClient, MockLLM
+from mosaic.orchestrator import AgentOrchestrator
+from mosaic.rerank import build_reranker
+from mosaic.retrieval import HybridRetriever
+
+
+class MosaicEngine:
+    def __init__(self, config: MosaicConfig, library: CapabilityLibrary,
+                 llm: Optional[LLMClient] = None, embedder: Optional[Embedder] = None,
+                 graph: Optional[CompatibilityGraph] = None):
+        self.config = config
+        self.library = library
+        self.llm = llm or MockLLM()
+        self.embedder = embedder or build_embedder(config)
+        self.graph = graph or CompatibilityGraph()
+        self._seed_graph_from_caps()
+
+        # §2.2 contextual capability embedding: enrich each capability with a
+        # model-written context before it is indexed for retrieval.
+        if config.contextualize and self.llm is not None:
+            Contextualizer(self.llm, config.context_cache_path).apply(library)
+
+        self.intent = IntentAnalyzer(self.llm)
+        self.retriever = HybridRetriever(
+            library, self.embedder,
+            reranker=build_reranker(config),
+            rrf_k=config.retrieval.rrf_k,
+            semantic_weight=config.retrieval.semantic_weight,
+            lexical_weight=config.retrieval.lexical_weight,
+        )
+        self.orchestrator = AgentOrchestrator(
+            self.graph, library, self.llm,
+            max_context_tokens=config.orchestrator.max_context_tokens,
+        )
+        self.evolution = CapabilityEvolutionEngine(
+            library, self.graph,
+            learning_rate=config.evolution.learning_rate,
+            prune_threshold=config.evolution.prune_threshold,
+        )
+
+    @classmethod
+    def from_config(cls, config: MosaicConfig, llm: Optional[LLMClient] = None) -> "MosaicEngine":
+        library = CapabilityLibrary.from_dir(config.capabilities_dir)
+        library.load_state(config.state_path)
+        return cls(config, library, llm=llm)
+
+    def _seed_graph_from_caps(self) -> None:
+        """Seed the compatibility graph from capabilities' declared relations."""
+        for cap in self.library:
+            for other in cap.compatible_capabilities:
+                self.graph.add_compatibility(cap.id, other, 0.5)
+            for other in cap.incompatible_capabilities:
+                self.graph.add_incompatibility(cap.id, other, "declared")
+
+    def compose(self, request: str):
+        intent = self.intent.analyze(request)
+        retrieved = self.retriever.retrieve(
+            request,
+            required_domains=intent.domains,
+            min_performance=self.config.retrieval.min_performance,
+            k_semantic=self.config.retrieval.k_semantic,
+            k_final=self.config.retrieval.k_final,
+        )
+        agent = self.orchestrator.compose_agent(intent, retrieved, request)
+        return intent, agent
+
+    def run(self, request: str, execute: bool = True) -> dict:
+        intent, agent = self.compose(request)
+        output = None
+        if execute and self.llm is not None:
+            output = self.llm.generate(
+                agent.prompt,
+                max_tokens=self.config.llm.max_tokens,
+                temperature=self.config.llm.temperature,
+            )
+        return {"intent": intent, "agent": agent, "output": output}
+
+    def feedback(self, agent, success: bool, quality: float = 1.0,
+                 persist: bool = False) -> None:
+        self.evolution.update_from_execution(agent, success, quality)
+        self.retriever.reindex()  # scores changed -> refresh the index
+        if persist:
+            self.library.save_state(self.config.state_path)

@@ -1,0 +1,33 @@
+# Copy to config.yaml and adapt to your environment.
+# config.yaml is gitignored so local endpoints stay out of the public repo.
+
+capabilities_dir: capabilities
+state_path: data/state.json
+
+# Embedding backend: hashing (offline, zero-dep) | sentence-transformers | llama-server
+embedder: hashing
+embedding_dim: 256
+
+llm:
+  # OpenAI-compatible endpoint, e.g. a local llama.cpp llama-server.
+  base_url: http://localhost:8080/v1
+  model: local-model
+  embedding_base_url: null      # null -> reuse base_url
+  embedding_model: local-embedding
+  temperature: 0.7
+  max_tokens: 512
+
+retrieval:
+  k_semantic: 20
+  k_final: 5
+  min_performance: 0.0
+  rrf_k: 60
+  semantic_weight: 0.6
+  lexical_weight: 0.4
+
+orchestrator:
+  max_context_tokens: 8000
+
+evolution:
+  learning_rate: 0.1
+  prune_threshold: 0.3

@@ -1,0 +1,85 @@
+"""Configuration for a MOSAIC deployment.
+
+Everything that could differ between machines (LLM endpoint, model name,
+embedding backend, paths) lives here and can be supplied via a ``config.yaml``
+file or environment variables. Nothing about a particular local cluster is
+hardcoded; defaults point at ``localhost``.
+"""
+from __future__ import annotations
+
+import os
+from pathlib import Path
+from typing import Any, Optional
+
+from pydantic import BaseModel, Field
+
+try:  # pyyaml is a core dep, but degrade gracefully if missing
+    import yaml
+except Exception:  # pragma: no cover
+    yaml = None
+
+
+class LLMConfig(BaseModel):
+    base_url: str = "http://localhost:8080/v1"   # OpenAI-compatible (llama-server)
+    api_key: str = "not-needed"                   # llama-server ignores auth
+    model: str = "local-model"
+    embedding_base_url: Optional[str] = None       # falls back to base_url
+    embedding_model: str = "local-embedding"
+    timeout: float = 120.0
+    temperature: float = 0.7
+    max_tokens: int = 512
+
+
+class RetrievalConfig(BaseModel):
+    k_semantic: int = 20
+    k_final: int = 5
+    min_performance: float = 0.0
+    rrf_k: int = 60
+    semantic_weight: float = 0.6
+    lexical_weight: float = 0.4
+
+
+class OrchestratorConfig(BaseModel):
+    max_context_tokens: int = 8000
+
+
+class EvolutionConfig(BaseModel):
+    learning_rate: float = 0.1
+    prune_threshold: float = 0.3
+
+
+class MosaicConfig(BaseModel):
+    capabilities_dir: str = "capabilities"
+    state_path: str = "data/state.json"
+    embedder: str = "hashing"        # hashing | sentence-transformers | llama-server
+    embedding_dim: int = 256         # used by the offline hashing embedder
+    contextualize: bool = True       # generate §2.2 contextual text before indexing
+    context_cache_path: str = "data/context_cache.json"
+    reranker: str = "none"           # none | lexical | flashrank
+    llm: LLMConfig = Field(default_factory=LLMConfig)
+    retrieval: RetrievalConfig = Field(default_factory=RetrievalConfig)
+    orchestrator: OrchestratorConfig = Field(default_factory=OrchestratorConfig)
+    evolution: EvolutionConfig = Field(default_factory=EvolutionConfig)
+
+    @classmethod
+    def load(cls, path: Optional[str | os.PathLike] = None) -> "MosaicConfig":
+        data: dict[str, Any] = {}
+        if path:
+            p = Path(path)
+            if p.exists() and yaml is not None:
+                data = yaml.safe_load(p.read_text()) or {}
+        cfg = cls(**data)
+        cfg.apply_env()
+        return cfg
+
+    def apply_env(self) -> "MosaicConfig":
+        """Environment overrides (handy for pointing at a local cluster)."""
+        if v := os.getenv("MOSAIC_LLM_BASE_URL"):
+            self.llm.base_url = v
+        if v := os.getenv("MOSAIC_LLM_MODEL"):
+            self.llm.model = v
+        if v := os.getenv("MOSAIC_EMBEDDER"):
+            self.embedder = v
+        if v := os.getenv("MOSAIC_CAPABILITIES_DIR"):
+            self.capabilities_dir = v
+        return self
